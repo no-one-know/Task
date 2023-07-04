@@ -1,25 +1,34 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import "./App.css";
+import Header from "./components/Header";
+import Todo from "./components/Todo";
+import TaskContext from "./components/TaskContext";
+import Navbar from "./components/Navbar";
 
-function App() {
+export default function App() {
+  const storedTasks = JSON.parse(localStorage.getItem("tasks"));
+  const [tasks, setTasks] = useState(storedTasks ? storedTasks : []);
+
+  const handleAddTask = (newTask) => {
+    setTasks([...tasks, newTask]);
+  };
+
+  useEffect(() => {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  }, [tasks]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Navbar />
+      <TaskContext.Provider
+        value={{
+          tasks, setTasks,
+          onAddTask: handleAddTask,
+        }}
+      >
+        <Header />
+        <Todo />
+      </TaskContext.Provider>
     </div>
   );
 }
-
-export default App;
