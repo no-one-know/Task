@@ -61,6 +61,7 @@ export default function Todo() {
   const [open, setOpen] = useState(false);
   const [priorityfilters, setPriorityFilters] = useState([]);
   const [statusfilters, setStatusFilters] = useState([]);
+  const [error, setError] = useState(false);
 
   const handleChangePriorityfilter = (event) => {
     const {
@@ -111,23 +112,23 @@ export default function Todo() {
     setTasks(updatedTasks);
   };
 
-  const handleEdit = (task) => {
+  const handleEdit = (task) => {  
     if (editingTask && editingTask.task === task) {
-      // Find the index of the task being edited in the tasks array
+      if (editedTask === "") {
+        setError(true);
+        return;
+      }
       const taskIndex = tasks.findIndex((t) => t.task === editingTask.task);
-
+  
       if (taskIndex !== -1) {
-        // Create a copy of the tasks array
         const updatedTasks = [...tasks];
-        // Update the task at the specified index with the edited task
         updatedTasks[taskIndex] = { ...editingTask, task: editedTask };
-        // Call the function to update the tasks
         setTasks(updatedTasks);
       }
       setEditingTask(null);
       setEditedTask("");
+      setError(false);
     } else {
-      // Start editing the task
       const taskToEdit = tasks.find((t) => t.task === task);
       setEditingTask(taskToEdit);
       setEditedTask(taskToEdit.task);
@@ -263,6 +264,19 @@ export default function Todo() {
                             <TextField
                               value={editedTask}
                               onChange={handleTaskChange}
+                              fullWidth
+                              error={error && editedTask === ""} // Show error if error state is true and task is empty
+                              helperText={
+                                error &&
+                                editedTask === "" &&
+                                "Task cannot be empty"
+                              } // Display helper text when error and empty task
+                              sx={{
+                                borderColor:
+                                  error && editedTask === ""
+                                    ? "red"
+                                    : "inherit",
+                              }} // Add red border if error and empty task
                             />
                           ) : (
                             task.task
